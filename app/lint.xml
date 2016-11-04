@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <issue id="NewApi">
+        <ignore path="src/co/megachips/hybridgps/ble_service/BleService.java" />
+        <ignore path="src/co/megachips/hybridgps/sub_activity/Geofencing.java" />
+    </issue>
+</lint>

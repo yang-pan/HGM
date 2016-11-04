@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/hybridgps_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:measureWithLargestChild="false"
+    android:orientation="vertical" >
+
+	<TextView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="10dp"
+		android:layout_marginLeft="10dp"
+		android:layout_marginTop="10dp"
+        android:text="Set GPS Value"
+		android:textAppearance="?android:attr/textAppearanceLarge" />
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical" >
+
+		<TextView
+			android:id="@+id/activity_time_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/activity_time_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="600"/>
+
+		<TextView
+			android:id="@+id/sleep_time_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/sleep_time_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="600"/>
+
+		<TextView
+			android:id="@+id/activity_time_indoor_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/activity_time_indoor_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="600"/>
+
+		<TextView
+			android:id="@+id/sleep_time_indoor_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/sleep_time_indoor_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="600"/>
+
+		<TextView
+			android:id="@+id/detect_timer_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/detect_timer_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="600"/>
+
+		<RadioGroup android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:id="@+id/mode_RadioGroup"
+			android:orientation="horizontal">
+			<RadioButton android:text="Detail Setting"
+				android:id="@+id/mode_RadioButton1"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content">
+			</RadioButton>
+			<RadioButton android:text="Simple Setting"
+				android:id="@+id/mode_RadioButton2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+			</RadioButton>
+		</RadioGroup>
+
+		<TextView
+			android:id="@+id/gps_sate_h_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/gps_sate_h_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="24"/>
+
+		<TextView
+			android:id="@+id/gps_sate_m_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/gps_sate_m_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="24"/>
+
+		<TextView
+			android:id="@+id/gps_hdop_h_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/gps_hdop_h_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="80"/>
+
+
+		<TextView
+			android:id="@+id/gps_hdop_m_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/gps_hdop_m_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="80"/>
+
+		<TextView
+			android:id="@+id/gps_accuracy_h_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/gps_accuracy_h_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="40"/>
+
+		<TextView
+			android:id="@+id/gps_accuracy_m_textview"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:minWidth="48dip"
+			android:gravity="center_horizontal"
+			android:layout_gravity="center_vertical"/>
+
+		<SeekBar
+			android:id="@+id/gps_accuracy_m_seekbar"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0.93"
+			android:progress="0"
+			android:max="40"/>
+
+		<Button
+			android:id="@+id/reset_button"
+			style="?android:attr/buttonStyleSmall"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="Reset" />
+
+	</LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,113 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_weight="10" >
+
+		<TextView
+		    android:id="@+id/textView1"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:text="\n file name"
+		    android:textColor="#000000"
+		    android:textSize="16sp" />
+
+		<TextView
+		    android:id="@+id/filenameText"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:text="-----"
+		    android:textColor="#000000"
+		    android:textSize="20sp" />
+
+		<TextView
+		    android:id="@+id/textView2"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:text="\n file path"
+		    android:textColor="#000000"
+		    android:textSize="16sp" />
+
+		<TextView
+		    android:id="@+id/filepathText"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:text="-----"
+		    android:textColor="#000000"
+		    android:textSize="20sp" />
+
+		<TextView
+		    android:id="@+id/textView3"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:text="\n file size"
+		    android:textColor="#000000"
+		    android:textSize="16sp" />
+
+		<TextView
+		    android:id="@+id/filesizeText"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:text="-----\n"
+		    android:textColor="#000000"
+		    android:textSize="20sp" />
+
+		<Button
+		    android:id="@+id/selectfilebutton"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:layout_marginRight="@dimen/activity_horizontal_margin"
+		    android:text="Select file" />
+
+		<TextView
+		    android:id="@+id/textView4"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:text="\n\n Transfer status"
+		    android:textColor="#000000"
+		    android:textSize="16sp" />
+
+		<ProgressBar
+		    android:id="@+id/progressBar"
+		    style="?android:attr/progressBarStyleHorizontal"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:layout_marginRight="@dimen/activity_horizontal_margin" />
+
+
+		<TextView
+		    android:id="@+id/transfer_status"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+		    android:textColor="#000000"
+		    android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        android:layout_weight="2"
+        >
+    </LinearLayout>
+
+</LinearLayout>

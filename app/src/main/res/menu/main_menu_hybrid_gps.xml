@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+     <item
+        android:id="@+id/gps_setting"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/gps_setting"/>
+     <item
+        android:id="@+id/dr_setting"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/dr_setting"/>
+
+    <item
+        android:id="@+id/output_setting"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/output_setting"/>
+</menu>
