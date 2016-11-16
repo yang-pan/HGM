@@ -101,6 +101,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 	private final int CALIBRATION_BUTTON = 2;
 	private final int HOST_START_STOP_BUTTON = 3;
 	private final int ANDROID_START_STOP_BUTTON = 4;
+	private final int LOG_BUTTON = 5;
 	//--[Button status]---------------------------------------------
 	private final boolean START_ENABLE = true;
 	private final boolean STOP_ENABLE = false;
@@ -127,6 +128,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 	private ImageButton calibrationButton;
 	private ImageButton host_startstopButton;
 	private ImageButton android_startstopButton;
+	private ImageButton logButton;
 	private Button reset_button;
 	//SeekBar-- for user setting -------------------------------------
 	private SeekBar seekbar_activity;
@@ -200,7 +202,8 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 	private GPS_converter.Android_GPS_packet android_gps_packet;
 	//Other---------------------------------------------------------------
 	private int pre_time_status = HybridGPS_Command.hybridgps_timer_status.NO_DATA;
-	private float pre_lon, pre_lat;
+	private float pre_lon = 135.50171f;
+	private float	pre_lat = 34.73562f;
 	private float gps_accuracy;
 
 	//color
@@ -291,8 +294,8 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 		Bitmap image = BitmapFactory.decodeResource(this.getResources(), R.drawable.menu_button_on);
 		int image_h = image.getHeight();
 		int image_w = image.getWidth();
-		float scale = (float) (disp.getWidth()/5.0f)/image_w;
-		params = new LinearLayout.LayoutParams((int) (disp.getWidth()/5), (int)(image_h * scale));
+		float scale = (float) (disp.getWidth()/6.0f)/image_w;
+		params = new LinearLayout.LayoutParams((int) (disp.getWidth()/6), (int)(image_h * scale));
 		params.setMargins(2, 2, 2, 2);
 
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -489,6 +492,36 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 			}
 		});
 
+	/*----------------------*/
+	/*		LOG button		*/
+	/*----------------------*/
+
+	logButton = new ImageButton(this);
+	logButton.setBackground(null);
+	logButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+	logButton.setPadding(0, 0, 0, 0);
+	logButton.setImageResource(R.drawable.ble_button_off);
+	logButton.setLayoutParams(params);
+	linearlayout3.addView(logButton);
+	logButton.setOnClickListener(new View.OnClickListener() {
+		public void onClick(View v) {
+			button_click_event(LOG_BUTTON);
+		}
+	});
+	logButton.setOnTouchListener(new View.OnTouchListener() {
+		public boolean onTouch(View v, MotionEvent event) {
+			int action = event.getAction();
+			switch(action){
+				case MotionEvent.ACTION_DOWN:
+					logButton.setImageResource(R.drawable.ble_button_on);
+					break;
+				case MotionEvent.ACTION_UP:
+					logButton.setImageResource(R.drawable.ble_button_off);
+					break;
+			}
+			return false;
+		}
+	});
 		mTimer = new Timer(true);
 		mTimer.schedule(new TimerTask() {
 			@Override
@@ -799,6 +832,17 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 					writeGPSLog.stop_logging();
 				}
 			}
+		}else if( clicked_button == LOG_BUTTON ){
+			int dummy[] = new int[1];
+			for ( int i = 0; i<10; i++) {
+				byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
+				broadcastData(data);
+				OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.blue_point);
+				pre_lat = pre_lat +0.0002f;
+				pre_lon = pre_lon +0.0002f;
+			}
+			//try {Thread.sleep(100);} catch (InterruptedException e) {}
+			//OSMEvent.MapPosition_center(pre_lat, pre_lon);
 		}
 		return;
 	}

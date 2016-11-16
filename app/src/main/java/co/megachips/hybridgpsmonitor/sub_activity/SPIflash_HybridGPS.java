@@ -62,6 +62,7 @@ public class SPIflash_HybridGPS extends Activity {
 
 	ImageButton menuButton;
 	ImageButton uartButton;
+	ImageButton bleButton;
 	ImageButton startstopButton;
 
 	BleDataHandler bleDataHandler;
@@ -69,6 +70,7 @@ public class SPIflash_HybridGPS extends Activity {
 	private final int UART_BUTTON = 0;
 	private final int START_STOP_BUTTON = 1;
 	private final int MENU_BUTTON = 2;
+	private final int BLE_BUTTON = 3;
 
 	private final int SAMPLING_FREQ_MAX = 60000;
 	private final int SAMPLING_FREQ_MIN = 10;
@@ -145,7 +147,7 @@ public class SPIflash_HybridGPS extends Activity {
 		linearlayout2.addView(scrollView);
 
 		LinearLayout linearlayout3 = (LinearLayout)findViewById(R.id.linearLayout3);
-		params = new LinearLayout.LayoutParams((int)(disp.getWidth())/3, 200);
+		params = new LinearLayout.LayoutParams((int)(disp.getWidth())/4, 200);
 		params.setMargins(2, 2, 2, 2);
 
 		inflater = LayoutInflater.from(this);
@@ -177,6 +179,37 @@ public class SPIflash_HybridGPS extends Activity {
 					menuButton.setImageResource(R.drawable.menu_button_off);
 					break;
 			}
+				return false;
+			}
+		});
+
+		/*----------------------*/
+		/*		BLE button		*/
+		/*----------------------*/
+
+		bleButton = new ImageButton(this);
+		bleButton.setBackground(null);
+		bleButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+		bleButton.setPadding(0, 0, 0, 0);
+		bleButton.setImageResource(R.drawable.ble_button_off);
+		bleButton.setLayoutParams(params);
+		linearlayout3.addView(bleButton);
+		bleButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				button_click_event(BLE_BUTTON);
+			}
+		});
+		bleButton.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				int action = event.getAction();
+				switch(action){
+					case MotionEvent.ACTION_DOWN:
+						bleButton.setImageResource(R.drawable.ble_button_on);
+						break;
+					case MotionEvent.ACTION_UP:
+						bleButton.setImageResource(R.drawable.ble_button_off);
+						break;
+				}
 				return false;
 			}
 		});
@@ -399,35 +432,42 @@ public class SPIflash_HybridGPS extends Activity {
 		//----------------------------------//
 		//		UART button pressed			//
 		//----------------------------------//
-		}else if( clicked_button == UART_BUTTON ){
+		}else if( clicked_button == UART_BUTTON ) {
 
-			customDialogView = inflater.inflate(R.layout.spi_hybridgps_dialog,
-					(ViewGroup)findViewById(R.id.spi_hybridgps_layout));
-			radio_output_type = (RadioGroup)customDialogView.findViewById(R.id.mode_RadioGroup);
-			radio_output_type.check(input_output_mode);
-			radio_output_type.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-				public void onCheckedChanged(RadioGroup group, int checkedId) {
-					input_output_mode = checkedId;
-				}
-				});
+            customDialogView = inflater.inflate(R.layout.spi_hybridgps_dialog,
+                    (ViewGroup) findViewById(R.id.spi_hybridgps_layout));
+            radio_output_type = (RadioGroup) customDialogView.findViewById(R.id.mode_RadioGroup);
+            radio_output_type.check(input_output_mode);
+            radio_output_type.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    input_output_mode = checkedId;
+                }
+            });
 
-			builder.setView(customDialogView)
-					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if(input_output_mode == R.id.mode_RadioButton1) {
-								byte[] data = new BleCommand(BleCommand.RequestType.SPI_FLASH_GPS_SET_UART).getData();
-								broadcastDataSPIflash(data);
-							} else if(input_output_mode == R.id.mode_RadioButton2){	//Gravity
-								byte[] data = new BleCommand(BleCommand.RequestType.SPI_FLASH_GRAVITY_SET_UART).getData();
-								broadcastDataSPIflash(data);
-							} else {	//Gravity
-								//non
-							}
-						}
-					})
-					.setNegativeButton("Cancel", null);
-			builder.show();
+            builder.setView(customDialogView)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (input_output_mode == R.id.mode_RadioButton1) {
+                                byte[] data = new BleCommand(BleCommand.RequestType.SPI_FLASH_GPS_SET_UART).getData();
+                                broadcastDataSPIflash(data);
+                            } else if (input_output_mode == R.id.mode_RadioButton2) {    //Gravity
+                                byte[] data = new BleCommand(BleCommand.RequestType.SPI_FLASH_GRAVITY_SET_UART).getData();
+                                broadcastDataSPIflash(data);
+                            } else {    //Gravity
+                                //non
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", null);
+            builder.show();
+        //--------------------------------------//
+        //		BLE button pressed		//
+        //--------------------------------------//
+        }else if(clicked_button == BLE_BUTTON ){
+            int dummy[] = new int[1];
+            byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
+            broadcastDataSPIflash(data);
 
 		//--------------------------------------//
 		//		START_STOP button pressed		//

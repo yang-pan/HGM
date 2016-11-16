@@ -25,7 +25,7 @@
 		android:icon="@drawable/frizz_icon"
 		android:label="@string/app_name"
 		android:theme="@style/CustomTheme">
-
+		//android:debuggable="true"
 		<activity
 			android:name="co.megachips.hybridgpsmonitor.MainMenu"
 			android:label="@string/app_name"

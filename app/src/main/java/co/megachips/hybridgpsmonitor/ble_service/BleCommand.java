@@ -138,6 +138,7 @@ public class BleCommand {
 		return data;
 	}
 
+
 	//Make data to activate sensor
 	public static byte[] registerListener(int sensor_id){
 		byte[] data = new byte[7];
