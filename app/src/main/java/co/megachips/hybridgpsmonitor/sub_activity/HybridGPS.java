@@ -2019,25 +2019,46 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 		public byte cnt=0;
 		public long timeStamp;
 		public boolean dataStatus;
+
 		public LOG_packet(DataPacket packet){
 			
-			if(packet.length == 56) {
+			if(packet.length == 24) {
+				byte b1, b2, b3, b4;
 				header_direction = packet.data.get(1);
 				sensorID = packet.data.get(2);
 				length = packet.data.get(3);
 				if((sensorID == -47)){
-					int dummy[] = new int[1];
-					byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
-					broadcastData(data);
+					//int dummy[] = new int[1];
+					//byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
+					//broadcastData(data);
+					b1 = packet.data.get(16);
+					b2 = packet.data.get(17);
+					b3 = packet.data.get(18);
+					b4 = packet.data.get(19);
+					pre_lat = combineByte_float(b1, b2, b3, b4);
+					b1 = packet.data.get(20);
+					b2 = packet.data.get(21);
+					b3 = packet.data.get(22);
+					b4 = packet.data.get(23);
+					pre_lon = combineByte_float(b1, b2, b3, b4);
 					OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.blue_point);
-					pre_lat = pre_lat +0.0002f;
-					pre_lon = pre_lon +0.0002f;
 					dataStatus = true;
 				}
 				else{
 					dataStatus = false;
 				}
 			}
+		}
+		private float combineByte_float(byte b1, byte b2, byte b3, byte b4){
+
+			byte[] bArray = new byte[4];
+			bArray[0] = b1;
+			bArray[1] = b2;
+			bArray[2] = b3;
+			bArray[3] = b4;
+			ByteBuffer buffer = ByteBuffer.wrap(bArray);
+
+			return buffer.getFloat();
 		}
 	}
 
