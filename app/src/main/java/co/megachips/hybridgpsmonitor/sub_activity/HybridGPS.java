@@ -199,6 +199,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 	private HybridGPS_packet hybridgps_Packet;
 	private Magnet_cali_raw_packet magnet_cali_raw_Packet;
 	private GPS_raw_packet gps_raw_Packet;
+	private LOG_packet	log_Packet;
 	private GPS_converter.Android_GPS_packet android_gps_packet;
 	//Other---------------------------------------------------------------
 	private int pre_time_status = HybridGPS_Command.hybridgps_timer_status.NO_DATA;
@@ -834,14 +835,16 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 			}
 		}else if( clicked_button == LOG_BUTTON ){
 			int dummy[] = new int[1];
-			for ( int i = 0; i<10; i++) {
+			//for ( int i = 0; i<10; i++) 
+			{
 				byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
 				broadcastData(data);
-				OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.blue_point);
-				pre_lat = pre_lat +0.0002f;
-				pre_lon = pre_lon +0.0002f;
+				//try {Thread.sleep(100);} catch (InterruptedException e) {}
+				//OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.blue_point);
+				//pre_lat = pre_lat +0.0002f;
+				//pre_lon = pre_lon +0.0002f;
 			}
-			//try {Thread.sleep(100);} catch (InterruptedException e) {}
+			//
 			//OSMEvent.MapPosition_center(pre_lat, pre_lon);
 		}
 		return;
@@ -897,6 +900,8 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 						hybridgps_Packet = new HybridGPS.HybridGPS_packet(dataPacket);
 						magnet_cali_raw_Packet = new HybridGPS.Magnet_cali_raw_packet(dataPacket);
 						gps_raw_Packet = new HybridGPS.GPS_raw_packet(dataPacket);
+						log_Packet = new LOG_packet(dataPacket);
+
 
 						if(hybridgps_Packet.dataStatus == true){
 							// Write HybridGPS packet data to file
@@ -959,6 +964,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 							}
 							pre_time_status = hybridgps_Packet.timer_status;
 						}
+
 						if(magnet_cali_raw_Packet.dataStatus == true){
 							hybridgps_CustomDraw.add_Magnet_calib_raw_Packet(magnet_cali_raw_Packet);
 							if(magnet_cali_raw_Packet.quality == HybridGPS_Command.magnet_cali_status.HIGH_QUARITY) {
@@ -973,7 +979,11 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 							writeGPSLog.write_log(gps_raw_Packet.getGPSParamAsString());
 							hybridgps_CustomDraw.update_GPS_data(gps_raw_Packet);
 						}
+						if(log_Packet.dataStatus == true){
+
+						}
 					}
+
 
 				}catch (Exception e){
 					return;
@@ -2000,6 +2010,35 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 			return str;
 		}
 
+	}
+
+	public class LOG_packet{
+		public byte header_direction;
+		public byte sensorID;
+		public byte length;
+		public byte cnt=0;
+		public long timeStamp;
+		public boolean dataStatus;
+		public LOG_packet(DataPacket packet){
+			
+			if(packet.length == 56) {
+				header_direction = packet.data.get(1);
+				sensorID = packet.data.get(2);
+				length = packet.data.get(3);
+				if((sensorID == -47)){
+					int dummy[] = new int[1];
+					byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
+					broadcastData(data);
+					OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.blue_point);
+					pre_lat = pre_lat +0.0002f;
+					pre_lon = pre_lon +0.0002f;
+					dataStatus = true;
+				}
+				else{
+					dataStatus = false;
+				}
+			}
+		}
 	}
 
 	/**@brief Broadcast intent with pointed data.
