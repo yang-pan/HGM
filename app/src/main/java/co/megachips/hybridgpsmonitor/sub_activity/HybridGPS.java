@@ -120,7 +120,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 
 	private Writer_log_to_file writeHybridGPSLog;	// HybridGPS Log writer
 	private Writer_log_to_file writeGPSLog;	// GPS Log writer
-
+	private Writer_log_to_file writeAngleLog;
 	// Not Final
 	//Button----------------------------------------------------------
 	private ImageButton menuButton;
@@ -205,7 +205,9 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 	private int pre_time_status = HybridGPS_Command.hybridgps_timer_status.NO_DATA;
 	private float pre_lon = 135.50171f;
 	private float	pre_lat = 34.73562f;
+	private int output_cnt = 0;
 	private float gps_accuracy;
+	private boolean get_initial_gps_data = false;
 
 	//color
 	public static final int LUCENT_RED    = 0x44FF0000;
@@ -666,6 +668,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 			hybridgps_CustomDraw.end_GPS();
 			OSMEvent.ClearLocationArray();
 			stop_gps();
+			get_initial_gps_data = false;
 			//Deactivate sensor
 			byte[] data = BleCommand.unregisterListener(BleCommand.SensorID.SENSOR_ID_HYBRIDGPS);
 			broadcastData(data);
@@ -777,6 +780,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 				OSMEvent.resetOffset();
 				hybridgps_CustomDraw.resetOffset();
 				OSMEvent.ClearLocationArray();
+				get_initial_gps_data = false;
 
 				//Activate HybridGPS sensor
 				byte[] data = new BleCommand(BleCommand.RequestType.SPI_FLASH_GPS_SET_SAMPLING_START).getData();
@@ -905,7 +909,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 
 						if(hybridgps_Packet.dataStatus == true){
 							// Write HybridGPS packet data to file
-							writeHybridGPSLog.write_log(hybridgps_Packet.getHybridGPSParamAsString());
+							//writeHybridGPSLog.write_log(hybridgps_Packet.getHybridGPSParamAsString());
 
 							if((hybridgps_Packet.timer_status != HybridGPS_Command.hybridgps_timer_status.NO_DATA)&&
 									(hybridgps_Packet.timer_status != HybridGPS_Command.hybridgps_timer_status.GPS_ACTIVE_TIME_INIT)) {
@@ -931,6 +935,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 
 
 							if (coordination_i != 0) {
+								writeHybridGPSLog.write_log(hybridgps_Packet.getHybridGPSParamAsString());
 								if (coordination_i == B_CORRDINATION_HYBRID) {
 									if(input_output_mode == HybridGPS_Command.output_mode.OUTPUT_DEMO)  {
 										OSMEvent.ClearLocationArray();
@@ -955,7 +960,12 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 									}
 									OSMEvent.draw_circle(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, hybridgps_Packet.error_radius, LUCENT_BLUE);
 									OSMEvent.MapPosition_center(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude);
-									OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.blue_point);
+									if(get_initial_gps_data == false) {
+										OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.purple_point);
+										get_initial_gps_data = true;
+									}else {
+										OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.blue_point);
+									}
 									pre_lat = hybridgps_Packet.coordination_latitude;
 									pre_lon = hybridgps_Packet.coordination_longitude;
 								} else {
@@ -1815,9 +1825,9 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 		public String getHybridGPSParamAsString(){
 			String str = String.valueOf(timeStamp)
 					+ "," + String.valueOf(gps_accuracy)
-					+ String.valueOf(timer_status)
-					+ String.valueOf(location_status)
-					+ String.valueOf(data_kind)
+					+ "," + String.valueOf(timer_status)
+					+ "," + String.valueOf(location_status)
+					+ "," + String.valueOf(data_kind)
 					+ "," + String.valueOf(step_count)
 					+ "," + String.valueOf(coordination_latitude)
 					+ "," + String.valueOf(coordination_longitude)
@@ -2016,8 +2026,6 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 		public byte header_direction;
 		public byte sensorID;
 		public byte length;
-		public byte cnt=0;
-		public long timeStamp;
 		public boolean dataStatus;
 
 		public LOG_packet(DataPacket packet){
@@ -2027,10 +2035,12 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 				header_direction = packet.data.get(1);
 				sensorID = packet.data.get(2);
 				length = packet.data.get(3);
-				if((sensorID == -47)){
-					//int dummy[] = new int[1];
-					//byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
-					//broadcastData(data);
+				/*
+				if((sensorID == -47) && (output_cnt<10)){
+					int dummy[] = new int[1];
+					byte[] data = BleCommand.Set_SensorControl_Param(0x08, 0x00, BleCommand.SensorID.SENSOR_ID_HYBRIDGPS, 0x00, dummy);
+					broadcastData(data);
+					output_cnt ++;
 					b1 = packet.data.get(16);
 					b2 = packet.data.get(17);
 					b3 = packet.data.get(18);
@@ -2042,6 +2052,21 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 					b4 = packet.data.get(23);
 					pre_lon = combineByte_float(b1, b2, b3, b4);
 					OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.blue_point);
+					dataStatus = true;
+				*/
+				if(sensorID == -47){
+					pre_lat = 34.742146f;
+					pre_lon = 135.50887f;
+					OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.purple_point);
+					pre_lat = 34.74111f;
+					pre_lon = 135.50888f;
+					OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.blue_point);
+					pre_lat = 34.74078f;
+					pre_lon = 135.5098f;
+					OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.red_point);
+					pre_lat = 34.741291046f;
+					pre_lon = 135.509445190f;
+					OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.green_point);
 					dataStatus = true;
 				}
 				else{
