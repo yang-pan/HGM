@@ -205,9 +205,18 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 	private int pre_time_status = HybridGPS_Command.hybridgps_timer_status.NO_DATA;
 	private float pre_lon = 135.50171f;
 	private float	pre_lat = 34.73562f;
+	private float pre_gps_lon = 0.0f;
+	private float pre_gps_lat = 0.0f;
+	private float initial_gps_data_lon = 0.0f;
+	private float initial_gps_data_lat = 0.0f;
+	private float Compensation_angle_a = 0.0f;
+	private float Compensation_angle_b = 0.0f;
+	private float compensation_angle = 0.0f;
+
 	private int output_cnt = 0;
 	private float gps_accuracy;
 	private boolean get_initial_gps_data = false;
+	private boolean angle_compensation_ready = false;
 
 	//color
 	public static final int LUCENT_RED    = 0x44FF0000;
@@ -669,6 +678,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 			OSMEvent.ClearLocationArray();
 			stop_gps();
 			get_initial_gps_data = false;
+			angle_compensation_ready = false;
 			//Deactivate sensor
 			byte[] data = BleCommand.unregisterListener(BleCommand.SensorID.SENSOR_ID_HYBRIDGPS);
 			broadcastData(data);
@@ -781,7 +791,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 				hybridgps_CustomDraw.resetOffset();
 				OSMEvent.ClearLocationArray();
 				get_initial_gps_data = false;
-
+				angle_compensation_ready = false;
 				//Activate HybridGPS sensor
 				byte[] data = new BleCommand(BleCommand.RequestType.SPI_FLASH_GPS_SET_SAMPLING_START).getData();
 				data[1] = (byte) ((LOG_INTERVAL & 0xFF000000)>>24);
@@ -943,13 +953,28 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 									}
 									if((hybridgps_Packet.timer_status == HybridGPS_Command.hybridgps_timer_status.GPS_ACTIVE_INDOOR_TIME) ||
 											(hybridgps_Packet.timer_status == HybridGPS_Command.hybridgps_timer_status.GPS_SLEEP_INDOOR_TIME)) {
-										OSMEvent.draw_circle(pre_lat, pre_lon, hybridgps_Packet.error_radius, LUCENT_GREEN);
-										OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.green_point);
+										//OSMEvent.draw_circle(pre_lat, pre_lon, hybridgps_Packet.error_radius, LUCENT_GREEN);
+										//OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.green_point);
 									} else {
-										OSMEvent.draw_circle(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, hybridgps_Packet.error_radius, LUCENT_RED);
-										OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.red_point);
-										pre_lat = hybridgps_Packet.coordination_latitude;
-										pre_lon = hybridgps_Packet.coordination_longitude;
+										if(angle_compensation_ready == true){
+											if(compensation_angle<0){
+												pre_lon = (float)((Math.cos(-compensation_angle)*(hybridgps_Packet.coordination_longitude-pre_gps_lon)) - Math.sin(-compensation_angle)*(hybridgps_Packet.coordination_latitude-pre_gps_lat) + pre_gps_lon);
+												pre_lat = (float)((Math.sin(-compensation_angle)*(hybridgps_Packet.coordination_longitude-pre_gps_lon)) + Math.cos(-compensation_angle)*(hybridgps_Packet.coordination_latitude-pre_gps_lat) + pre_gps_lat);
+											}else{
+												pre_lon = (float)((Math.cos(compensation_angle)*(hybridgps_Packet.coordination_longitude-pre_gps_lon)) + Math.sin(compensation_angle)*(hybridgps_Packet.coordination_latitude-pre_gps_lat) + pre_gps_lon);
+												pre_lat = (float)(-(Math.sin(compensation_angle)*(hybridgps_Packet.coordination_longitude-pre_gps_lon)) + Math.cos(compensation_angle)*(hybridgps_Packet.coordination_latitude-pre_gps_lat) + pre_gps_lat);
+											}
+											OSMEvent.draw_point(pre_lat, pre_lon, R.drawable.purple_point);
+											OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.green_point);
+										}else{
+											//OSMEvent.draw_circle(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, hybridgps_Packet.error_radius, LUCENT_RED);
+											OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.red_point);
+											pre_lat = hybridgps_Packet.coordination_latitude;
+											pre_lon = hybridgps_Packet.coordination_longitude;
+										}
+										//pre_lat = hybridgps_Packet.coordination_latitude;
+										//pre_lon = hybridgps_Packet.coordination_longitude;
+
 									}
 								} else if(((coordination_i == B_CORRDINATION_GPS) && (hybridgps_Packet.gps_accuracy == HybridGPS_Command.gps_status.HIGH_QUARITY))||
 										(coordination_i == B_CORRDINATION_GPS) && (pre_time_status == HybridGPS_Command.hybridgps_timer_status.GPS_ACTIVE_TIME_INIT) &&
@@ -963,11 +988,21 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 									if(get_initial_gps_data == false) {
 										OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.purple_point);
 										get_initial_gps_data = true;
+										initial_gps_data_lon = hybridgps_Packet.coordination_longitude;
+										initial_gps_data_lat = hybridgps_Packet.coordination_latitude;
 									}else {
+										pre_gps_lat = hybridgps_Packet.coordination_latitude;
+										pre_gps_lon = hybridgps_Packet.coordination_longitude;
+										if(angle_compensation_ready == false){
+											angle_compensation_ready = true;
+											Compensation_angle_a = (float)(Math.atan2((pre_lat-initial_gps_data_lat),(pre_lon-initial_gps_data_lon)));
+											Compensation_angle_b = (float)(Math.atan2((pre_gps_lat-initial_gps_data_lat),(pre_gps_lon-initial_gps_data_lon)));
+											compensation_angle = Compensation_angle_a-Compensation_angle_b;
+										}
 										OSMEvent.draw_point(hybridgps_Packet.coordination_latitude, hybridgps_Packet.coordination_longitude, R.drawable.blue_point);
 									}
-									pre_lat = hybridgps_Packet.coordination_latitude;
-									pre_lon = hybridgps_Packet.coordination_longitude;
+									//pre_lat = hybridgps_Packet.coordination_latitude;
+									//pre_lon = hybridgps_Packet.coordination_longitude;
 								} else {
 									//non
 								}
@@ -1039,6 +1074,8 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 			}
 		}
 	};
+
+
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -1824,6 +1861,9 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 		 */
 		public String getHybridGPSParamAsString(){
 			String str = String.valueOf(timeStamp)
+					+ "," + String.valueOf(Compensation_angle_a)
+					+ "," + String.valueOf(Compensation_angle_b)
+					+ "," + String.valueOf(compensation_angle)
 					+ "," + String.valueOf(gps_accuracy)
 					+ "," + String.valueOf(timer_status)
 					+ "," + String.valueOf(location_status)

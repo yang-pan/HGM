@@ -81,10 +81,10 @@ public class HybridGPS_Command {
 		public static  final int DEFAULT_SLEEP_TIME_INDOOR = 180;
 		public static  final int DEFAULT_DETECT_TIME = 180;
 		public static  final int DEFAULT_TYPE_SIMPLE = gps_type.DEFAULT_TYPE_SIMPLE;
-		public static  final int DEFAULT_SATE_H = 10;
-		public static  final int DEFAULT_SATE_M = 8;
-		public static  final int DEFAULT_HDOP_H = 8; 	// HDOP=value/10
-		public static  final int DEFAULT_HDOP_M = 10; 	// HDOP=value/10
+		public static  final int DEFAULT_SATE_H = 8;
+		public static  final int DEFAULT_SATE_M = 7;
+		public static  final int DEFAULT_HDOP_H = 12; 	// HDOP=value/10
+		public static  final int DEFAULT_HDOP_M = 16; 	// HDOP=value/10
 		public static  final int DEFAULT_ACCURACY_H = 10;
 		public static  final int DEFAULT_ACCURACY_M = 15;
 
@@ -95,7 +95,7 @@ public class HybridGPS_Command {
 		public static  final int DEFAULT_DR_PLOT = 0;
 		public static  final int DEFAULT_DETECT_HANDMODE = device_hand_mode.LEFT_HAND_MODE;
 		//output setting--------------------------------------------------------------
-		public static  final int DEFAULT_OUTPUT = output_mode.OUTPUT_DEMO;
+		public static  final int DEFAULT_OUTPUT = output_mode.OUTPUT_DEBUG;
 	}
 
 
