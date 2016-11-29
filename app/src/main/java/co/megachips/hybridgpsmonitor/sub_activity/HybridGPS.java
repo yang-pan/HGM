@@ -116,7 +116,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 	private final byte B_CORRDINATION_HYBRID = 0x02;
 	private final byte B_CORRDINATION_GPS = 0x04;
 
-	private final boolean GPS_SENSOR_OUTPUT = false; //false:not activate GPS sensro true:Activate GPS sensor
+	private final boolean GPS_SENSOR_OUTPUT = true;//false; //false:not activate GPS sensro true:Activate GPS sensor
 
 	private Writer_log_to_file writeHybridGPSLog;	// HybridGPS Log writer
 	private Writer_log_to_file writeGPSLog;	// GPS Log writer
@@ -720,10 +720,12 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 				OSMEvent.resetOffset();
 				hybridgps_CustomDraw.resetOffset();
 				OSMEvent.ClearLocationArray();
-				if(GPS_SENSOR_OUTPUT == true) {
+				if(GPS_SENSOR_OUTPUT == true)
+				{
 					//Activate GPS sensor
 					data = BleCommand.registerListener(BleCommand.SensorID.SENSOR_ID_GPS_RAW);
 					broadcastData(data);
+
 				}
 
 				data = new BleCommand(BleCommand.RequestType.SPI_FLASH_GPS_SET_SAMPLING_START).getData();
@@ -734,33 +736,37 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 				broadcastDataSPIflash(data);
 
 				//Show dialog
-				dialog = new ProgressDialog(this);
-				dialog.setIndeterminate(true);
-				dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				dialog.setMessage(getResources().getString(R.string.get_gps_data));
-				dialog.show();
+				//dialog = new ProgressDialog(this);
+				//dialog.setIndeterminate(true);
+				//dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				//dialog.setMessage(getResources().getString(R.string.get_gps_data));
+				//dialog.show();
 				host_startstopStatus = STOP_ENABLE;
 				host_startstopButton.setImageResource(R.drawable.host_stop_button_off);
 
 				//Activate HybridGPS sensor
-				data = BleCommand.registerListener(BleCommand.SensorID.SENSOR_ID_HYBRID_WRAPPER);
-				broadcastData(data);
+				//data = BleCommand.registerListener(BleCommand.SensorID.SENSOR_ID_HYBRID_WRAPPER);
+				//broadcastData(data);
 
+				data = BleCommand.registerListener(BleCommand.SensorID.SENSOR_ID_HYBRIDGPS);
+				broadcastData(data);
 				// Start Logging data to file
 				writeGPSLog =  new Writer_log_to_file();	// GPS Log writer
 				writeGPSLog.start_logging(BleCommand.SensorID.SENSOR_ID_GPS_RAW);
-				writeHybridGPSLog =  new Writer_log_to_file();	// HybridGPS Log writer
-				writeHybridGPSLog.start_logging(BleCommand.SensorID.SENSOR_ID_HYBRID_WRAPPER);
+				//writeHybridGPSLog =  new Writer_log_to_file();	// HybridGPS Log writer
+				//writeHybridGPSLog.start_logging(BleCommand.SensorID.SENSOR_ID_HYBRID_WRAPPER);
 				pre_time_status = HybridGPS_Command.hybridgps_timer_status.NO_DATA;
-				android_gps_packet = gps_converter.GPGGA_init();
+				//android_gps_packet = gps_converter.GPGGA_init();
 
 				hybridgps_CustomDraw.set_gps_output(false);
 			}else{
 				hybridgps_CustomDraw.end_GPS();
 				//Deactivate sensor
-				byte[] data = BleCommand.unregisterListener(BleCommand.SensorID.SENSOR_ID_HYBRID_WRAPPER);
-				broadcastData(data);
+				byte[] data ;//= BleCommand.unregisterListener(BleCommand.SensorID.SENSOR_ID_HYBRID_WRAPPER);
+				//broadcastData(data);
 				data = BleCommand.unregisterListener(BleCommand.SensorID.SENSOR_ID_GPS_RAW);
+				broadcastData(data);
+				data = BleCommand.unregisterListener(BleCommand.SensorID.SENSOR_ID_HYBRIDGPS);
 				broadcastData(data);
 				host_startstopStatus = START_ENABLE;
 				host_startstopButton.setImageResource(R.drawable.host_start_button_off);
@@ -911,12 +917,12 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 						DataPacket dataPacket = (DataPacket)bData.data;
 						// If sensorID is SENSOR_ID_PDR(0x98), it use PDR class.
 						// If sensorID is SENSOR_ID_STAIR_DETECTOR, it use stair_detector_packet class.
-						hybridgps_Packet = new HybridGPS.HybridGPS_packet(dataPacket);
-						magnet_cali_raw_Packet = new HybridGPS.Magnet_cali_raw_packet(dataPacket);
+						//hybridgps_Packet = new HybridGPS.HybridGPS_packet(dataPacket);
+						//magnet_cali_raw_Packet = new HybridGPS.Magnet_cali_raw_packet(dataPacket);
 						gps_raw_Packet = new HybridGPS.GPS_raw_packet(dataPacket);
-						log_Packet = new LOG_packet(dataPacket);
+						//log_Packet = new LOG_packet(dataPacket);
 
-
+/*
 						if(hybridgps_Packet.dataStatus == true){
 							// Write HybridGPS packet data to file
 							//writeHybridGPSLog.write_log(hybridgps_Packet.getHybridGPSParamAsString());
@@ -1019,10 +1025,13 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 								broadcastData(data);
 							}
 						}
+						*/
 						if(gps_raw_Packet.dataStatus == true) {
 							// Write GPS packet data to file
+							//writeHybridGPSLog.write_log(hybridgps_Packet.getHybridGPSParamAsString());
 							writeGPSLog.write_log(gps_raw_Packet.getGPSParamAsString());
-							hybridgps_CustomDraw.update_GPS_data(gps_raw_Packet);
+							hybridgps_CustomDraw.update_GPS_data(gps_raw_Packet.satellites_used,gps_raw_Packet.gpgga_hdop);
+							OSMEvent.draw_point(gps_raw_Packet.direction_lat, gps_raw_Packet.direction_lon, R.drawable.blue_point);
 						}
 						if(log_Packet.dataStatus == true){
 
@@ -1877,6 +1886,7 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 			str += "\n";
 			return str;
 		}
+
 	}
 
 	public class Magnet_cali_raw_packet{
@@ -2015,7 +2025,14 @@ public class HybridGPS extends FragmentActivity implements MapEventListener, Loc
 				b3 = packet.data.get(30);
 				b4 = packet.data.get(31);
 				gpgga_altitude = combineByte_float(b1, b2, b3, b4);
-				dataStatus = true;
+				//if((gpgga_hdop< 1.4f)&&(gpgga_hdop!=0))
+				//{
+					dataStatus = true;
+				//}
+				//else{
+				//	dataStatus = false;
+				//}
+
 			} else {
 				dataStatus = false;
 			}
